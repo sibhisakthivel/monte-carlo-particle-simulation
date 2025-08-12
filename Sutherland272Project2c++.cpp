@@ -127,12 +127,15 @@ int main() {
                 system.particles[i].y = old_y;
             }
         }
+
+        //Plot every iteration
+
     }
     
     std::cout << "ending positions: " << std::endl;
     system.printpos();
 
-    #final plot
+    // final plot
     {std::vector<double> x, y;
     x.reserve(system.particles.size());
     y.reserve(system.particles.size());
