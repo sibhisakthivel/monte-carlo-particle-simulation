@@ -7,8 +7,11 @@
 #include <cmath>
 #include <cstdlib>
 #include <vector>
-#include "matplotlibcpp.h"
+#include "matplotlibcpp.h" //plotting
+#include <filesystem> //handle output folder
+
 namespace plt = matplotlibcpp;
+namespace outpath = std::filesystem;
 
 const double sim_size = 25;
 const int numparticles = 5;
@@ -87,26 +90,46 @@ class lennard_jones {
     }
 };
 
+//save a plot for the current particle positions
+void save_iter_plot(const std::vector<particle> &pts,
+                    int step,
+                    const std::string &prefix = "lennardjones_step_")
+{
+
+    //link output folder
+    const std::string folder = "out";
+    outpath::create_directories(folder);
+
+    //current coordinates
+    std::vector<double> x, y;
+    x.reserve(pts.size());
+    y.reserve(pts.size());
+    for (const auto &k : pts)
+    {
+        x.push_back(k.x);
+        y.push_back(k.y);
+    }
+
+    plt::clf(); //clear previous frame
+    plt::figure_size(250, 250);
+    plt::scatter(x, y, 10);
+    plt::xlim(0.0, sim_size);
+    plt::ylim(0.0, sim_size);
+    plt::title("Lennard Jones step " + std::to_string(step));
+    plt::xlabel("x");
+    plt::ylabel("y");
+
+    char fname[256];
+    std::snprintf(fname, sizeof(fname), "%s/%s%04d.png", folder.c_str(), prefix.c_str(), step);
+    plt::save(fname);
+}
+
 int main() {
     lennard_jones system (numparticles);
     std::cout << "initial positions:" << std::endl;
     system.printpos();
     std::cout << std::endl;
-
-    //initial plot
-    {std::vector<double> x, y;
-    x.reserve(system.particles.size());
-    y.reserve(system.particles.size());
-    for (const auto& k : system.particles) {x.push_back(k.x); y.push_back(k.y);}
-
-    plt::plot(x, y);
-    plt::figure_size(250,250);
-    plt::scatter(x, y, 10);
-    plt::title("Lennard Jones Initial");
-    plt::xlabel("x");
-    plt::ylabel("y");
-    plt::save("lennardjonesinitial.png");
-}
+    save_iter_plot(system.particles, 0); //initial particle position plot
 
     //Metropolis loop
     for (int step = 0; step < steps; step++) {
@@ -128,27 +151,11 @@ int main() {
             }
         }
 
-        //Plot every iteration
-
+        //plot every iteration
+        save_iter_plot(system.particles, step + 1);
     }
     
     std::cout << "ending positions: " << std::endl;
     system.printpos();
-
-    // final plot
-    {std::vector<double> x, y;
-    x.reserve(system.particles.size());
-    y.reserve(system.particles.size());
-    for (const auto& k : system.particles) {x.push_back(k.x); y.push_back(k.y);}
-
-    plt::plot(x, y);
-    plt::figure_size(250,250);
-    plt::scatter(x, y, 10);
-    plt::title("Lennard Jones Final");
-    plt::xlabel("x");
-    plt::ylabel("y");
-    plt::save("lennardjonesfinal.png");
-    }
     return 0;
-
 }
