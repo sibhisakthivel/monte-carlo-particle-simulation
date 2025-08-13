@@ -83,6 +83,8 @@ def plot_ParticleLocations(iterations, M3D, N):
 
         if i == 0:
             plt.scatter(M3D[i,1,:], M3D[i, 2, :], alpha = 0.3)
+            plt.xlim(-120, 120)
+            plt.ylim(-120, 120)
             plt.title('initial conditions')
             plt.xlabel('x-plane position')
             plt.ylabel('y-plane position')
@@ -91,6 +93,8 @@ def plot_ParticleLocations(iterations, M3D, N):
         if i%100 == 0:
             
             plt.scatter(M3D[i,1,:], M3D[i, 2, :], alpha = 0.3)
+            plt.xlim(-120, 120)
+            plt.ylim(-120, 120)
             plt.title(f'Particle 2D Positions: {i}, Iterations, {N}, Particles')
             plt.xlabel('x-plane position')
             plt.ylabel('y-plane position')
