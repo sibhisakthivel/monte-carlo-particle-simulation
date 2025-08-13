@@ -95,7 +95,7 @@ def plot_ParticleLocations(iterations, M3D, N):
             plt.scatter(M3D[i,1,:], M3D[i, 2, :], alpha = 0.3)
             plt.xlim(-120, 120)
             plt.ylim(-120, 120)
-            plt.title(f'Particle 2D Positions: {i}, Iterations, {N}, Particles')
+            plt.title(f'Particle 2D Positions: {i} Iterations, {N} Particles')
             plt.xlabel('x-plane position')
             plt.ylabel('y-plane position')
             plt.show()
