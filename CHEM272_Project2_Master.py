@@ -126,3 +126,6 @@ class LennardJones_Potential():
     def Plot_Histograms(self):
         plot_Utot_histograms(self.iterations, self.Matrix, self.N)
 
+M = PotentialToMotion(iterations=10000, N=200, a=1.0, b=2.0, T=37.0, step_size = 0.3)
+plot_ParticleLocations(100000, M, 200)
+
