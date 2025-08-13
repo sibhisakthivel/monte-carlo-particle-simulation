@@ -14,12 +14,12 @@ namespace plt = matplotlibcpp;
 namespace outpath = std::filesystem;
 
 const double sim_size = 25;
-const int numparticles = 5;
-const int steps = 100;
+const int numparticles = 200;
+const int steps = 10000;
 const double displacement = 0.3;
-const double epsilon = 1;
-const double sigma = 1;
-const double temp = 1;
+const double a = 1;
+const double b = 1;
+const double temp = 37;
 
 class particle {
 public: //to make easily accessible throughout the rest of the code
@@ -37,11 +37,11 @@ public: //to make easily accessible throughout the rest of the code
         x += ((double)std::rand() / RAND_MAX * 2 - 1) * displacement;
         y += ((double)std::rand() / RAND_MAX * 2 - 1) * displacement;
 
-        // to keep particles in sim boundaries
-        if (x < 0) x += sim_size;
-        if (x >= sim_size) x -= sim_size;
-        if (y < 0) y += sim_size;
-        if (y >= sim_size) y -= sim_size;
+        //optional: use pbc to keep particles in sim boundaries by "wrapping"
+        //if (x < 0) x += sim_size;
+        //if (x >= sim_size) x -= sim_size;
+        //if (y < 0) y += sim_size;
+        //if (y >= sim_size) y -= sim_size;
     }
 };
 
@@ -52,13 +52,13 @@ class lennard_jones {
     lennard_jones(int N) : particles (N){}
     //Lennard_Jones potential using Euclidean distance formula
     double l_j (double dx, double dy) const {
-        //have to use r2 and r6 bc r**2 (etc.) is invalid for c++
+        //have to use r6 and r3 bc r**6 (etc.) is invalid for c++
         double r = std::sqrt (dx * dx + dy * dy);
         //to prevent division by zero
         if (r == 0) return 0;
-        double r6 = std::pow(sigma / r, 6);
-        double r12 = std::pow(sigma / r, 12);
-        return 4 * epsilon * (r12 - r6);
+        double r6 = std::pow(r, 6);
+        double r3 = std::pow(r, 3);
+        return (a / r6) - (b / r3);
     }
 
     //to find the max potential energy of the system
@@ -69,12 +69,12 @@ class lennard_jones {
                 double dx = particles[i].x - particles[j].x;
                 double dy = particles[i].y - particles[j].y;
 
-                //using MIC to ensure correct distance between particles
+                //optional: use MIC to ensure correct distance between particles
                 //is being measured
-                if (dx > sim_size / 2) dx -= sim_size;
-                if (dx < -sim_size / 2) dx += sim_size;
-                if (dy > sim_size / 2) dy -= sim_size;
-                if (dy < -sim_size / 2) dy += sim_size;
+                //if (dx > sim_size / 2) dx -= sim_size;
+                //if (dx < -sim_size / 2) dx += sim_size;
+                //if (dy > sim_size / 2) dy -= sim_size;
+                //if (dy < -sim_size / 2) dy += sim_size;
 
                 e += l_j(dx, dy);
             }
@@ -133,29 +133,30 @@ int main() {
 
     //Metropolis loop
     for (int step = 0; step < steps; step++) {
-        int i = std::rand() % numparticles;
+        for (int i = 0; i < numparticles; i++) {
 
-        double old_x = system.particles[i].x;
-        double old_y = system.particles[i].y;
-        double old_energy = system.potential_energy();
+            double old_x = system.particles[i].x;
+            double old_y = system.particles[i].y;
+            double old_energy = system.potential_energy();
 
-        system.particles[i].move();
+            system.particles[i].move();
 
-        double new_energy = system.potential_energy();
-        double deltaE = new_energy - old_energy;
-        if (deltaE > 0) {
-            double r = (double)std::rand() / RAND_MAX;
-            if (r > std::exp(-deltaE / temp)) {
-                system.particles[i].x = old_x;
-                system.particles[i].y = old_y;
+            double new_energy = system.potential_energy();
+            double deltaE = new_energy - old_energy;
+            if (deltaE > 0) {
+                double r = (double)std::rand() / RAND_MAX;
+                if (r > std::exp(-deltaE / temp)) {
+                    system.particles[i].x = old_x;
+                    system.particles[i].y = old_y;
+                }
             }
         }
-
         //plot every iteration
         save_iter_plot(system.particles, step + 1);
+        
     }
-    
     std::cout << "ending positions: " << std::endl;
     system.printpos();
     return 0;
+
 }
