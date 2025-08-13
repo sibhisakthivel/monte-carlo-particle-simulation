@@ -96,17 +96,6 @@ def plot_ParticleLocations(iterations, M3D, N):
             plt.ylabel('y-plane position')
             plt.show()
 
-def plot_Utot_histograms(iterations, M3D, N):
-        
-    for i in range(iterations):
-        
-        if not i%100:
-
-            plt.hist(M3D[i, 0, :], density = False, histtype = 'step', facecolor = 'g', alpha = 0.75)
-            plt.xlabel('Total Potential per Particle')
-            plt.ylabel('Number of Particles')
-            plt.title(F'Total Potential Distribution: {i} Iterations, {N} Particles')
-            plt.show()
 
 
 class LennardJones_Potential():
@@ -123,8 +112,7 @@ class LennardJones_Potential():
     def Plot_xy_Locations(self):
         plot_ParticleLocations(self.iterations, self.Matrix, self.N)
     
-    def Plot_Histograms(self):
-        plot_Utot_histograms(self.iterations, self.Matrix, self.N)
+
 
 M = PotentialToMotion(iterations=10000, N=200, a=1.0, b=2.0, T=37.0, step_size = 0.3)
 plot_ParticleLocations(100000, M, 200)
