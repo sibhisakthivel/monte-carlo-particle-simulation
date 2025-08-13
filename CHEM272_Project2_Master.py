@@ -110,6 +110,9 @@ class LennardJones_Potential():
         self.iterations = iterations
         self.N = N
         self.a = a
+        self.b = b
+        self.T = T
+        self.step_size = step_size
         
         self.Matrix = PotentialToMotion(iterations, N, a, b, T, step_size)
         
